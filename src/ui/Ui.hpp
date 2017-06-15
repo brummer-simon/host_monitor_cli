@@ -74,7 +74,7 @@ auto makeUi(std::vector<std::shared_ptr<HostMonitor>> const&         monitors,
         lenAlias = (len > lenAlias) ? len : lenAlias;
 
         // Find longest target length
-        len = (*it)->getEndpoint().targetAddr.size();
+        len = (*it)->getEndpoint().getTarget().size();
         lenTarget = (len > lenTarget) ? len : lenTarget;
     }
 
@@ -133,14 +133,18 @@ auto makeUi(std::vector<std::shared_ptr<HostMonitor>> const&         monitors,
         posX += lenAlias + UiConfig::advance;
 
         // Add Target to line, advance by lenAlias
-        elements.push_back(makeTextElement(posX, posY, mon.getEndpoint().targetAddr));
+        elements.push_back(makeTextElement(posX, posY, mon.getEndpoint().getTarget()));
         posX += lenTarget + UiConfig::advance;
 
         // Add Protocol to line
-        switch (mon.getEndpoint().protocol)
+        switch (mon.getEndpoint().getProtocol())
         {
         case Protocol::ICMP:
             elements.push_back(makeTextElement(posX, posY, "ICMP"));
+            break;
+
+        case Protocol::TCP:
+            elements.push_back(makeTextElement(posX, posY, "TCP"));
             break;
         }
         posX += UiConfig::lenProto + UiConfig::advance;

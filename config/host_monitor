@@ -1,12 +1,15 @@
 # Example host_monitor config file
 
+# Example ICMP connection
 Host:     Google         # Host = Display name. Humanfriendly alias for HostName.
-HostName: www.google.de  # HostName: FQDN or Ip-Address
-Protocol: icmp           # Protocol that is used to reach HostName. Allowed values: icmp
+HostName: www.google.de  # HostName: FQDN or IP-Address
+Protocol: icmp           # Protocol that is used to reach HostName. Allowed values: icmp, tcp
 Interval: 5              # Duration between connection attempts in seconds.
 
-Host:     Heise
-HostName: www.heise.de
-Protocol: icmp
-Interval: 10
+# Example TCP connection
+Host:     Heise          # @see above
+HostName: www.heise.de   # @see above
+HostPort: 22             # Portnumber, needed then 'Protocol: tcp'
+Protocol: tcp            # @see above
+Interval: 10             # @see above
 
