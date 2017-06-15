@@ -20,6 +20,7 @@
 
 #include "ui/Ui.hpp"
 #include "ui/Terminal.hpp"
+#include "config/Config.hpp"
 #include "HostMonitor.hpp"
 #include "Observer.hpp"
 
@@ -28,7 +29,7 @@ using namespace host_monitor;
 /* Constants */
 namespace
 {
-    size_t const refreshRate = 30; // In Hz
+    size_t const                    refreshRate = 30; // In Hz
     std::chrono::milliseconds const sleepDuration(1000 / refreshRate);
 }
 
@@ -49,16 +50,16 @@ void sigHandler(int sig)
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     // Register signal handler
     signal(SIGINT, sigHandler);
 
-    // Create Monitors
-    std::vector<std::shared_ptr<HostMonitor>> monitors;
-    monitors.push_back(makeHostMonitor(makeIcmpEndpoint("www.heise.de"), "Heise", std::chrono::seconds(5)));
+    // Parse given arguments and read config file
+    auto args = readArgs(argc, argv);
+    auto monitors = readConfigFile(args["-f"]);
 
-    // Create Observers
+    // Create Observers based on read HostMonitors
     std::vector<std::shared_ptr<HostMonitorObserver>> observers;
     for (auto it = monitors.begin(); it != monitors.end(); ++it)
     {

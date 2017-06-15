@@ -79,8 +79,8 @@ auto makeUi(std::vector<std::shared_ptr<HostMonitor>> const&         monitors,
     }
 
     // Ensure that UiLabels fit into lenAlias and lenTarget
-    lenAlias  = (lenAlias < sizeof("Alias")) ? sizeof("Alias") : lenAlias;
-    lenTarget = (lenTarget < sizeof("Target")) ? sizeof("Target") : lenTarget;
+    lenAlias  = (lenAlias < sizeof("Host")) ? sizeof("Host") : lenAlias;
+    lenTarget = (lenTarget < sizeof("Hostname")) ? sizeof("Hostname") : lenTarget;
 
     // Calculate main window height and width
     size_t mainw = 0;
@@ -105,9 +105,9 @@ auto makeUi(std::vector<std::shared_ptr<HostMonitor>> const&         monitors,
     // Create Headline
     posX = 0 + UiConfig::border;
     posY += 1;
-    elements.push_back(makeTextElement(posX, posY, "Alias"));
+    elements.push_back(makeTextElement(posX, posY, "Host"));
     posX += lenAlias + UiConfig::advance;
-    elements.push_back(makeTextElement(posX, posY, "Target"));
+    elements.push_back(makeTextElement(posX, posY, "Hostname"));
     posX += lenTarget + UiConfig::advance;
     elements.push_back(makeTextElement(posX, posY, "Protocol"));
     posX += UiConfig::lenProto + UiConfig::advance;
