@@ -87,7 +87,7 @@ auto makeUi(std::vector<std::shared_ptr<HostMonitor>> const&         monitors,
     mainw += lenAlias + lenTarget + UiConfig::lenProto + UiConfig::lenAvail;
     mainw += (UiConfig::border * 2) + (UiConfig::advance * 3) - 1;
 
-    size_t mainh = monitors.size() + (UiConfig::border * 2) + 2;
+    size_t mainh = monitors.size() + (UiConfig::border * 2) + 4;
 
     // Shrink main window in case it exceeds terminal
     mainw = (termWidth < mainw) ? termWidth : mainw;
@@ -152,6 +152,16 @@ auto makeUi(std::vector<std::shared_ptr<HostMonitor>> const&         monitors,
         // Add Observer to line
         elements.push_back(makeObserverElement(posX, posY, observers[i]));
     }
+
+    // Write footer
+    posX = 0 + UiConfig::border;
+    posY += 1;
+    elements.push_back(makeLineElement(posX, posY, LineElement::Orientation::Horizontal,
+                                       mainw - (UiConfig::border * 2)));
+
+    posX = 0 + UiConfig::border;
+    posY += 1;
+    elements.push_back(makeTextElement(posX, posY, "Press 'crtl+c' to exit program"));
 
     // Return created user interface
     return std::shared_ptr<Ui>(new Ui(makeWindow(mainx, mainy, mainw, mainh, elements)));

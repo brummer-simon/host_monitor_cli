@@ -59,11 +59,12 @@ public:
 private:
     auto setupTerm() -> void
     {
-        initscr();    // Init ncurses
-        noecho();     // Suppress typed characters
-        curs_set(0);  // Hide cursor
-        clear();      // Clear entire screen
-        refresh();    // Refresh screen with empty screen
+        initscr();     // Init ncurses
+        noecho();      // Suppress typed characters
+        curs_set(0);   // Hide cursor
+        start_color(); // Enable Colors
+        clear();       // Clear entire screen
+        refresh();     // Refresh screen with empty screen
     }
     auto cleanupTerm() -> void
     {

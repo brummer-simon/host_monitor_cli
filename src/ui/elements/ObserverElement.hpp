@@ -54,9 +54,22 @@ public:
      */
     virtual auto draw(WINDOW *wnd) -> void const
     {
-        std::string content = observer->avail() ? UiConfig::avail : UiConfig::nonAvail;
+
         BaseElement::draw(wnd);
-        wprintw(wnd, "%s", content.c_str());
+        if (observer->avail())
+        {
+            init_pair(1, COLOR_GREEN, COLOR_BLACK);
+            wattron(wnd, COLOR_PAIR(1));
+            wprintw(wnd, "%s", UiConfig::avail);
+            wattroff(wnd, COLOR_PAIR(1));
+        }
+        else
+        {
+            init_pair(2, COLOR_RED, COLOR_BLACK);
+            wattron(wnd, COLOR_PAIR(2));
+            wprintw(wnd, "%s", UiConfig::nonAvail);
+            wattroff(wnd, COLOR_PAIR(2));
+        }
     }
 
 protected:

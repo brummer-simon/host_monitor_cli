@@ -180,7 +180,7 @@ inline auto readConfigFile(std::string const& path) -> std::vector<std::shared_p
 
     std::string          strHost;
     std::string          strHostname;
-    uint16_t             valHostport = 0;
+    std::string          strHostport;
     Protocol             valProtocol = Protocol::ICMP;
     std::chrono::seconds valInterval;
 
@@ -213,32 +213,8 @@ inline auto readConfigFile(std::string const& path) -> std::vector<std::shared_p
         {
             // Extract value, set flag
             it->erase(it->begin(), it->begin() + sizeof("HostPort:"));
-            std::string strHostport = trim(*it);
-
-            try
-            {
-                // Convert string to int and check if int is sane boundries
-                int val = std::stoi(strHostport);
-                int min = std::numeric_limits<uint16_t>::min();
-                int max = std::numeric_limits<uint16_t>::max();
-
-                if (min <= val && val <= max)
-                {
-                    valHostport = val;
-                    hostport = true;
-                }
-                else
-                {
-                    // Will be catched below
-                    throw std::runtime_error("out-of-bounds");
-                }
-            }
-            catch (std::invalid_argument& e)
-            {
-                std::cerr << "Invalid Port: '" << strHostport << "'" << std::endl;
-                exit(-1);
-            }
-
+            strHostport = trim(*it);
+            hostport = true;
         }
 
         // Check for tag: 'Protocol:'
@@ -247,26 +223,22 @@ inline auto readConfigFile(std::string const& path) -> std::vector<std::shared_p
         {
             // Extract value, set flag
             it->erase(it->begin(), it->begin() + sizeof("Protocol:"));
-            std::string strProtocol = trim(*it);
-            std::cout << strProtocol << std::endl;
 
-            // Check Protocol
-            if (strProtocol == "icmp")
+            try
             {
-                // ICMP Only: mark port for as true. Its not evaluated anyway.
-                valProtocol = Protocol::ICMP;
-                valHostport = 0;
-                hostport = true;
+                valProtocol = stringToProtocol(trim(*it));
             }
-            else if (strProtocol == "tcp")
+            catch(...)
             {
-                valProtocol = Protocol::TCP;
-            }
-            // Unknown Protocol. Abort
-            else
-            {
-                std::cerr << "Unknown Protocol: '" << strProtocol << "'" << std::endl;
+                std::cerr << "Faulty config file: " << trim(*it) << " is no valid protocol.";
+                std::cerr << std::endl;;
                 exit(-1);
+            }
+
+            // Mark port as true if protocol is ICMP. Port is ignore there anyway
+            if (valProtocol == Protocol::ICMP)
+            {
+                hostport = true;
             }
             protocol = true;
         }
@@ -306,7 +278,16 @@ inline auto readConfigFile(std::string const& path) -> std::vector<std::shared_p
                 break;
 
             case Protocol::TCP:
-                m = makeHostMonitor(makeTcpEndpoint(strHostname, valHostport), strHost, valInterval);
+                try
+                {
+                    m = makeHostMonitor(makeTcpEndpoint(strHostname, strHostport), strHost, valInterval);
+                }
+                catch (...)
+                {
+                    std::cerr << "Faulty config file: " << strHostport << " is no valid portnumber.";
+                    std::cerr << std::endl;;
+                    exit(-1);
+                }
                 break;
             }
             mon.push_back(m);
