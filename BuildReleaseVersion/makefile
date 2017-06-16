@@ -44,7 +44,7 @@ all: host_monitor_cli.elf
 host_monitor_cli.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L"/home/s_brummer/git-repos/host_monitor/BuildReleaseVersion" -o "host_monitor_cli.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"$(GIT_REPOS)/host_monitor/BuildReleaseVersion" -o "host_monitor_cli.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
