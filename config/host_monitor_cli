@@ -1,0 +1,49 @@
+# Example configuration for host_monitor_cli
+
+
+BEGIN_CONFIG            # Begin Config section
+# Field Order. Possible values are 'FQHN' 'ALIAS' 'ROLE' 'DEVICE' 'PROTOCOL' 'INTERVAL'.
+# All fields, that should be visible in the ui must be in 'FIELD_ORDER'
+FIELD_ORDER: ALIAS FQHN ROLE DEVICE PROTOCOL INTERVAL  
+END_CONFIG              # End Config section
+
+# Example Group Configuration
+BEGIN_GROUP                   # Begin Group
+NAME: Search Engines          # Group Name (optional)
+
+# Example Host configuration (tcp)
+BEGIN_HOST                    # Begin Host (Hosts must be within a group section)
+FQHN:     duckduckgo.com      # FQHN: IP-Addr or FQDN of the target. Mandatory
+ALIAS:    DuckDuckGo          # Alias for FQHN. Optional
+ROLE:     Search Engine       # Role. Optional
+DEVICE:   Unknown             # Device. Optional
+PROTOCOL: TCP                 # Protocol to use: Either 'ICMP' or 'TCP'. Mandatory
+PORT:     80                  # Port used in connection attempt. Mandatory if PROTOCOL is 'TCP'.
+INTERVAL: 5                   # Time between connection attempts in sec. Mandatory
+END_HOST                      # End host section
+
+# Example Host configuration (tcp)
+BEGIN_HOST                    # see above
+FQHN:     www.google.de       # see above
+ALIAS:    Google              # see above
+ROLE:     Search Engine       # see above
+DEVICE:   Unknown             # see above
+PROTOCOL: TCP                 # see above
+PORT:     80                  # see above
+INTERVAL: 10                  # see above
+END_HOST                      # see above
+END_GROUP                     # End Group
+
+# Example Anonymus Group
+BEGIN_GROUP                   # Begin Group (group without name)
+
+# Example Host configuration (icmp)
+BEGIN_HOST
+FQHN:     127.0.0.1          # see above
+ALIAS:    localhost          # see above
+ROLE:     localhost          # see abobe
+DEVICE:   Your PC            # see above
+PROTOCOL: ICMP               # see above
+INTERVAL: 10                 # see above
+END_HOST                     # see above
+END_GROUP                    # End group

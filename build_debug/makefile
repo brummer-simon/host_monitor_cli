@@ -44,7 +44,7 @@ all: host_monitor_cli-dbg.elf
 host_monitor_cli-dbg.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L"$(GIT_REPOS)/host_monitor/BuildDebugVersion" -o "host_monitor_cli-dbg.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"../../host_monitor/build_debug" -o "host_monitor_cli-dbg.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
