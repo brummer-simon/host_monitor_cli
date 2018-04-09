@@ -21,8 +21,8 @@ Window::Window( Position const& origin
     , origin_(origin)
     , width_(width)
     , height_(height)
-    , color_(ColorPair( Window::Color::White 
-                      , Window::Color::Black))
+    , color_(ColorPair( Window::Color::Default 
+                      , Window::Color::Default))
 {
     // Create Window Pointer
     auto pointer = newwin(height, width, origin.y, origin.x);

@@ -49,6 +49,7 @@ public:
     // Predefined colors by curses
     enum class Color
     {
+        Default = -1,
         Black   = COLOR_BLACK,
         Red     = COLOR_RED,
         Green   = COLOR_GREEN,

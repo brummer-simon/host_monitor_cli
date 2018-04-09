@@ -157,6 +157,7 @@ void UserInterface::setup_curses()
     noecho();
     curs_set(0);
     start_color();
+    use_default_colors();
     clear();
     refresh();
 
