@@ -111,20 +111,12 @@ auto ObserverElement::get_width() -> std::uint16_t
                                      , std::strlen(ui_status_unavailable));
 }
 
-void ObserverElement::state_change( Endpoint const&             endpoint
-                                  , std::vector<uint8_t> const& metadata
-                                  , std::chrono::seconds const& interval
-                                  , bool                        available)
+void ObserverElement::state_change(HostMonitorObserver::Data const& data)
 {
-    // Surpress compiler warnings.
-    (void) endpoint;
-    (void) metadata;
-    (void) interval;
-
     // State change occured.
     // Update internal state and notify ui thread to redraw ui.
     auto lock = std::unique_lock<std::mutex>(mtx_);
-    available_ = available;
+    available_ = data.available;
     redraw_ui_= true;
     cv_.notify_one();
 }

@@ -20,13 +20,13 @@
 #include <condition_variable>
 #include <functional>
 #include <csignal>
+#include <host_monitor/HostMonitor.hpp>
 #include "Args.hpp"
 #include "Config.hpp"
 #include "Util.hpp"
 #include "UserInterface.hpp"
 #include "GroupElement.hpp"
 #include "ObserverElement.hpp"
-#include "../../host_monitor/include/HostMonitor.hpp"
 
 using namespace host_monitor;
 
@@ -102,9 +102,7 @@ int main(int argc, char **argv)
 
             auto interval = sec(string_to_int(host.interval).value());
 
-            auto monitor = std::make_shared<HostMonitor>( endpoint
-                                                        , std::vector<uint8_t>()
-                                                        , interval);
+            auto monitor = std::make_shared<HostMonitor>(endpoint, interval);
 
             auto observer = std::make_shared<ObserverElement>( host
                                                              , config.global.field_format
@@ -136,7 +134,7 @@ int main(int argc, char **argv)
             redraw_ui = true;
         }
 
-        // Internal state of the shown observers changed. Redraw ui 
+        // Internal state of the shown observers changed. Redraw ui
         if (redraw_ui)
         {
             redraw_ui = false;

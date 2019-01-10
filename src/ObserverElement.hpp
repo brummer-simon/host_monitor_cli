@@ -25,8 +25,8 @@
 #include "../../host_monitor/include/HostMonitor.hpp"
 #include "../../host_monitor/include/HostMonitorObserver.hpp"
 
-using HostMonitorObserver = host_monitor::HostMonitorObserver;
-using Endpoint = host_monitor::Endpoint;
+using host_monitor::HostMonitorObserver;
+using host_monitor::Endpoint;
 
 // Ui element that can be registered as observer on the host monitor.
 class ObserverElement : public Element, public HostMonitorObserver
@@ -35,7 +35,7 @@ public:
     using Pointer = std::shared_ptr<ObserverElement>;
 
     // Constructor: @p mtx, @p cv, @p redraw_ui are used for synchronization
-    //              with the main thread. @p host and @p fmt is used to 
+    //              with the main thread. @p host and @p fmt is used to
     //              draw the ui element contents.
     ObserverElement( ConfigHost const&                          host
                    , std::vector<ConfigGlobal::FieldFmt> const& fmt
@@ -52,10 +52,7 @@ public:
 
     // HostMonitorObserver interface implementation. Executed in the thread
     // context of host monitor
-    virtual void state_change( Endpoint const&             endpoint
-                             , std::vector<uint8_t> const& metadata
-                             , std::chrono::seconds const& interval
-                             , bool                        available) override;
+    virtual void state_change(HostMonitorObserver::Data const& data) override;
 
 private:
     std::string              content_;
