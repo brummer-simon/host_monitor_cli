@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      ObserverElement.cpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Command line argument parsing.
+ * @copyright 2017 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file   ObserverElement.cpp
- * @author Simon Brummer
- * @date   08.04.2018
  */
 
 #include <cstring>
@@ -21,7 +20,8 @@ ObserverElement::ObserverElement( ConfigHost const&                          hos
                                 , std::vector<ConfigGlobal::FieldFmt> const& fmt
                                 , std::mutex&                                mtx
                                 , std::condition_variable&                   cv
-                                , std::atomic_bool&                          redraw_ui)
+                                , std::atomic_bool&                          redraw_ui
+                                )
    : content_()
    , available_(false)
    , mtx_(mtx)
@@ -69,20 +69,20 @@ ObserverElement::ObserverElement( ConfigHost const&                          hos
     content_ = std::move(str);
 }
 
-void ObserverElement::draw(Window::Pointer wnd, Position& pos)
+void ObserverElement::draw(Window::Pointer wnd, Position& pos) const
 {
     // Calculate number of left characters, prevent underflow
-    auto chars_left = std::int16_t(0);
+    auto chars_left = 0;
     chars_left = wnd->get_width() - (2 * (ui_border_width + ui_line_offset_x));
     chars_left = (chars_left < 0) ? 0 : chars_left;
 
     wnd->add_string(content_, chars_left);
 
-    pos.x += content_.size();
+    pos.x += static_cast<unsigned>(content_.size());
     wnd->move_to(pos);
 
-    // Remove consumend characters, again check for underflow
-    chars_left -= content_.size();
+    // Remove consumed characters, again check for underflow
+    chars_left -= static_cast<int>(content_.size());
     chars_left = (chars_left < 0) ? 0 : chars_left;
 
     if (available_)
@@ -100,31 +100,27 @@ void ObserverElement::draw(Window::Pointer wnd, Position& pos)
     wnd->unset_color();
 }
 
-auto ObserverElement::get_height() -> std::uint16_t
+unsigned ObserverElement::get_height() const
 {
     return ui_observer_elem_height;
 }
 
-auto ObserverElement::get_width() -> std::uint16_t
+unsigned ObserverElement::get_width() const
 {
-    return content_.size() + std::max( std::strlen(ui_status_available)
-                                     , std::strlen(ui_status_unavailable));
+    auto width = static_cast<unsigned>(content_.size());
+
+    return width + static_cast<unsigned>(std::max( std::strlen(ui_status_available)
+                                                 , std::strlen(ui_status_unavailable)
+                                                 )
+                                        );
 }
 
-void ObserverElement::state_change( Endpoint const&             endpoint
-                                  , std::vector<uint8_t> const& metadata
-                                  , std::chrono::seconds const& interval
-                                  , bool                        available)
+void ObserverElement::state_change(HostMonitorObserver::Data const& data)
 {
-    // Surpress compiler warnings.
-    (void) endpoint;
-    (void) metadata;
-    (void) interval;
-
     // State change occured.
     // Update internal state and notify ui thread to redraw ui.
     auto lock = std::unique_lock<std::mutex>(mtx_);
-    available_ = available;
+    available_ = data.available;
     redraw_ui_= true;
     cv_.notify_one();
 }

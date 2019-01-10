@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      Args.cpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Command line argument parsing.
+ * @copyright 2017 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file   Args.cpp
- * @author Simon Brummer
- * @date   08.04.2018
  */
 
 #include <vector>
@@ -17,10 +16,11 @@
 #include "Constants.hpp"
 #include "Util.hpp"
 #include "Args.hpp"
+#include "Version.hpp"
 
 namespace
 {
-auto print_usage() -> void
+void print_usage()
 {
     std::cout << "\n";
     std::cout << "Usage:\n";
@@ -29,11 +29,26 @@ auto print_usage() -> void
     std::cout << "Options:\n";
     std::cout << "    -f <path>   User specified configuration file\n";
     std::cout << "    -h          Print this help\n";
+    std::cout << "    -v          Print Version Information\n";
     std::cout << std::endl;
 }
+
+void print_version()
+{
+    std::cout << "host_monitor_cli " << Version::full << "\n";
+    std::cout << "Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>\n";
+    std::cout << "\n";
+    std::cout << "This file is subject to the terms and conditions of the GNU Lesser General Public License v2.1.\n";
+    std::cout << "This is free software: you are free to change and redistribute it.\n";
+    std::cout << "There is NO WARRANTY, to the extent permitted by law.\n";
+    std::cout << "\n";
+    std::cout << "Written by Simon Brummer.";
+    std::cout << std::endl;
+}
+
 } // namespace anon
 
-auto read_args(int cargc, char **cargv) -> std::map<std::string, std::string>
+std::map<std::string, std::string> read_args(int cargc, char **cargv)
 {
     auto args = std::map<std::string, std::string>();
     auto argv = std::vector<std::string>();
@@ -52,6 +67,12 @@ auto read_args(int cargc, char **cargv) -> std::map<std::string, std::string>
         if (*it == "-h")
         {
             print_usage();
+            exit(0);
+        }
+        // Examine -v option
+        else if (*it == "-v")
+        {
+            print_version();
             exit(0);
         }
         // Examine -f Option
