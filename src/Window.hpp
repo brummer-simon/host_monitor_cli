@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      Window.hpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Wrapper for ncurses windows
+ * @copyright 2018 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file   Window.hpp
- * @author Simon Brummer
- * @date   08.04.2018
  */
 
 #ifndef WINDOW_HPP_201804081223
@@ -24,15 +23,13 @@
 // Helper struct. Position in x,y - plane
 struct Position
 {
-    std::int32_t x = 0;
-    std::int32_t y = 0;
+    unsigned x = 0;
+    unsigned y = 0;
 
-    Position()
-    {
-    }
-
-    Position( std::int32_t x
-            , std::int32_t y)
+    Position() = default;
+    Position( unsigned x
+            , unsigned y
+            )
         : x(x)
         , y(y)
     {
@@ -43,11 +40,11 @@ struct Position
 class Window
 {
 public:
-    using Pointer = std::shared_ptr<Window>;
+    using Pointer   = std::shared_ptr<Window>;
     using CursesWnd = WINDOW;
 
     // Predefined colors by curses
-    enum class Color
+    enum class Color : short
     {
         Default = -1,
         Black   = COLOR_BLACK,
@@ -63,31 +60,31 @@ public:
     // Constructor: @p origin is the position of upper left corner of window
     // @p width and @p height are the windows height and width in terms of characters.
     Window( Position const& origin
-          , std::uint32_t   width
-          , std::uint32_t   height);
+          , unsigned        width
+          , unsigned        height
+          );
 
     // Move to specific position in window, relative to the windows origin.
     void move_to(Position const& pos);
 
     // Set current foreground color.
     void set_foreground_color(Window::Color c);
-    
+
     // Set current background color.
     void set_background_color(Window::Color c);
 
     // Set fore- and background color.
-    void set_color( Window::Color fg
-                  , Window::Color bg);
+    void set_color(Window::Color fg, Window::Color bg);
 
-    // Revert setted color back to the default.
+    // Revert current color back to the default.
     // Before setting a new color, unset has to be called.
-    void unset_color(void);
+    void unset_color();
 
     // Add underlined to current attributes.
-    void set_underlined(void);
+    void set_underlined();
 
     // Remove underlined from current attributes.
-    void unset_underlined(void);
+    void unset_underlined();
 
     // Add string to current position.
     template<typename... Args>
@@ -100,74 +97,74 @@ public:
     void add_string(std::string const& str);
 
     // Add string with up to @p str_len characters to current position.
-    void add_string( std::string const& str
-                   , std::size_t        str_len);
+    void add_string( std::string const& str, std::size_t str_len);
 
     // Add c-string with up to @p str_len characters to current position.
     void add_string(char const *str, std::size_t str_len);
 
     // Add vertical line to current position with default character.
-    void add_vertical_line(std::uint32_t len);
+    void add_vertical_line(unsigned len);
 
     // Add vertical line to current position with user defined character.
-    void add_vertical_line(std::uint8_t ch, std::uint32_t len);
+    void add_vertical_line(char ch, unsigned len);
 
     // Add horizontal line to current position with default character.
-    void add_horizontal_line(std::uint32_t len);
+    void add_horizontal_line(unsigned len);
 
     // Add horizontal line to current position with user defined character.
-    void add_horizontal_line(std::uint8_t ch, std::uint32_t len);
+    void add_horizontal_line(char ch, unsigned len);
 
     // Add default border around entire window.
     void add_border(void);
 
     // Add user defined border around entire window.
-    void add_border( std::uint8_t left_side
-                   , std::uint8_t right_side
-                   , std::uint8_t top_side
-                   , std::uint8_t bottom_side
-                   , std::uint8_t top_left_corner
-                   , std::uint8_t top_right_corner
-                   , std::uint8_t bottom_left_corner
-                   , std::uint8_t bottom_right_corner);
+    void add_border( char left_side
+                   , char right_side
+                   , char top_side
+                   , char bottom_side
+                   , char top_left_corner
+                   , char top_right_corner
+                   , char bottom_left_corner
+                   , char bottom_right_corner
+                   );
 
     // Clear entire windows contents
-    void erase(void);
+    void erase();
 
     // Show current window state. Changes are only visible after calling refresh.
-    void refresh(void);
+    void refresh();
 
     // Get window origin.
-    auto get_origin(void) -> Position;
+    Position get_origin() const;
 
     // Get window width.
-    auto get_width(void) -> std::uint32_t;
+    unsigned get_width() const;
 
     // Get window height.
-    auto get_height(void) -> std::uint32_t;
+    unsigned get_height() const;
 
     // Get current foreground color.
-    auto get_fg_color(void) -> Window::Color;
+    Window::Color get_fg_color() const;
 
     // Get current background color.
-    auto get_bg_color(void) -> Window::Color;
+    Window::Color get_bg_color() const;
 
     // Get raw pointer to curses window.
-    auto get_raw_pointer(void) -> CursesWnd *;
+    CursesWnd* get_raw_pointer() const;
 
 private:
     using CursesWndDel = std::function<void(CursesWnd*)>;
-    using ColorPair = std::pair<Window::Color, Window::Color>;
-    using ColorMap = std::map<ColorPair, std::uint16_t>;
+    using ColorPair    = std::pair<Window::Color, Window::Color>;
+    using ColorMap     = std::map<ColorPair, short>;
 
     // Handle on curses window with custom deleter for automatic cleanup.
     std::unique_ptr<CursesWnd, CursesWndDel> wnd_;
 
-    Position      origin_;
-    std::uint32_t width_;
-    std::uint32_t height_;
-    ColorPair     color_;
-    ColorMap      colors_;
+    Position  origin_;
+    unsigned  width_;
+    unsigned  height_;
+    ColorPair color_;
+    ColorMap  colors_;
 };
 
 #endif // WINDOW_HPP_201804081223

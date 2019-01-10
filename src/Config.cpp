@@ -1,34 +1,33 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      Config.cpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Command line argument parsing.
+ * @copyright 2017 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
-/**
- * @file   Config.cpp
- * @author Simon Brummer
- * @date   08.04.2018
- */
-
 #include <fstream>
 #include <cstring>
+#include <host_monitor/Endpoint.hpp>
 #include "Util.hpp"
 #include "Constants.hpp"
 #include "Config.hpp"
-#include "../../host_monitor/include/Endpoint.hpp"
 
 using namespace host_monitor;
 
 namespace
 {
-using LineNo      = uint32_t;
+using LineNo      = unsigned;
 using LineContent = std::string;
 using Line        = std::pair<LineNo, LineContent>;
 
 // Parsing error. Prints line the error occured
-auto abort_parsing(Line const& line, std::string error_msg) -> void
+void abort_parsing(Line const& line, std::string error_msg)
 {
     std::cerr << "Conifg parsing error: '" << error_msg << "' in";
     std::cerr << " line: '" << line.first;
@@ -38,13 +37,13 @@ auto abort_parsing(Line const& line, std::string error_msg) -> void
 }
 
 // Get content from line
-auto get_line_content(Line const& line) -> std::string_view
+std::string_view get_line_content(Line const& line)
 {
     return std::string_view(line.second);
 }
 
 // Get marker from line
-auto get_line_marker(Line const& line) -> std::string_view
+std::string_view get_line_marker(Line const& line)
 {
     // Convert line to view an trim it
     auto content = get_line_content(line);
@@ -67,7 +66,7 @@ auto get_line_marker(Line const& line) -> std::string_view
 }
 
 // Get value from a line associated with a marker
-auto get_line_value(Line const& line, char const * marker) -> std::string_view
+std::string_view get_line_value(Line const& line, char const *marker)
 {
     // Convert line to view an trim it
     auto content = get_line_content(line);
@@ -96,7 +95,7 @@ auto get_line_value(Line const& line, char const * marker) -> std::string_view
 }
 
 // Remove comments and trim the result
-auto trim_and_remove_comment(std::string const& line)-> std::string_view
+std::string_view trim_and_remove_comment(std::string const& line)
 {
     auto line_view = std::string_view(line);
 
@@ -113,7 +112,8 @@ auto trim_and_remove_comment(std::string const& line)-> std::string_view
 
 // Load given config file into a vector. Discards empty lines and comments.
 void load_config_file( std::string const& cfg_file_path
-                     , std::vector<Line>& cfg_file_content)
+                     , std::vector<Line>& cfg_file_content
+                     )
 {
     // Try to open config file.
     std::ifstream ifs(cfg_file_path.c_str(), std::ifstream::in);
@@ -142,8 +142,8 @@ void load_config_file( std::string const& cfg_file_path
 
         // In case the line contains any content:
         // Construct string from view. This line i needed later
-        cfg_file_content.push_back(Line(line_no, std::string( line_view.begin()
-                                                            , line_view.end())));
+        auto lineContent = std::string( line_view.begin(), line_view.end());
+        cfg_file_content.push_back(Line(line_no, std::move(lineContent)));
     }
     ifs.close();
 }
@@ -151,7 +151,8 @@ void load_config_file( std::string const& cfg_file_path
 // Read host section into config structure
 void read_host_section( std::vector<Line>::const_iterator& line
                       , std::vector<Line>::const_iterator  end
-                      , ConfigGroup&                       grp)
+                      , ConfigGroup&                       grp
+                      )
 {
     auto section = ConfigHost();
     auto begin = line;
@@ -185,49 +186,42 @@ void read_host_section( std::vector<Line>::const_iterator& line
             auto view = get_line_value(*line, cfg_marker_host_fqhn);
             section.fqhn = std::move(std::string(view.begin(), view.end()));
         }
-
         // 2) Read Alias
         else if (marker == cfg_marker_host_alias)
         {
             auto view = get_line_value(*line, cfg_marker_host_alias);
             section.alias = std::move(std::string(view.begin(), view.end()));
         }
-
         // 3) Read Role
         else if (marker == cfg_marker_host_role)
         {
             auto view = get_line_value(*line, cfg_marker_host_role);
             section.role = std::move(std::string(view.begin(), view.end()));
         }
-
         // 4) Read Device
         else if (marker == cfg_marker_host_device)
         {
             auto view = get_line_value(*line, cfg_marker_host_device);
             section.device = std::move(std::string(view.begin(), view.end()));
         }
-
         // 5) Read Protocol
         else if (marker == cfg_marker_host_protocol)
         {
             auto view = get_line_value(*line, cfg_marker_host_protocol);
             section.protocol = std::move(std::string(view.begin(), view.end()));
         }
-
         // 6) Read Port
         else if (marker == cfg_marker_host_port)
         {
             auto view = get_line_value(*line, cfg_marker_host_port);
             section.port = std::move(std::string(view.begin(), view.end()));
         }
-
         // 7) Read Interval
         else if (marker == cfg_marker_host_interval)
         {
             auto view = get_line_value(*line, cfg_marker_host_interval);
             section.interval = std::move(std::string(view.begin(), view.end()));
         }
-
         // 8) Read section end. Assign read section and return.
         else if(marker == cfg_marker_host_section_end)
         {
@@ -248,7 +242,8 @@ void read_host_section( std::vector<Line>::const_iterator& line
 // Read group section into config structure
 void read_group_section( std::vector<Line>::const_iterator& line
                        , std::vector<Line>::const_iterator  end
-                       , Config&                            cfg)
+                       , Config&                            cfg
+                       )
 {
     auto section = ConfigGroup();
     auto begin = line;
@@ -277,13 +272,11 @@ void read_group_section( std::vector<Line>::const_iterator& line
             auto view = get_line_value(*line, cfg_marker_group_name);
             section.name = std::move(std::string(view.begin(), view.end()));
         }
-
         // 2) Read host section.
         else if(marker == cfg_marker_host_section_begin)
         {
             read_host_section(line, end, section);
         }
-
         // 3) Read section end. Assign read section and return.
         else if(marker == cfg_marker_group_section_end)
         {
@@ -304,7 +297,8 @@ void read_group_section( std::vector<Line>::const_iterator& line
 // Read config section into config structure
 void read_config_section( std::vector<Line>::const_iterator& line
                         , std::vector<Line>::const_iterator  end
-                        , Config&                            cfg)
+                        , Config&                            cfg
+                        )
 {
     auto section = ConfigGlobal();
     auto begin = line;
@@ -428,7 +422,7 @@ void verify_host_section(ConfigHost const& host)
             {
                 abort("A host is missing the manditory field: PORT. Only for TCP hosts");
             }
-            
+
             // Verfiy that given port is a valid port.
             auto port = string_to_int(host.port.value());
             if (port)
@@ -534,7 +528,8 @@ void verify_config(Config const& cfg)
 
 // Determine the field types, the ui consists of, by interpreting the field order.
 void get_field_types_in_use( std::string const&                   field_order
-                           , std::vector<ConfigGlobal::FieldFmt>& fmt)
+                           , std::vector<ConfigGlobal::FieldFmt>& fmt
+                           )
 {
     // Add an entry to fmt for each field in field_order
     auto view = std::string_view(field_order);
@@ -566,7 +561,7 @@ void get_field_types_in_use( std::string const&                   field_order
 }
 
 // Get length of the static ui fields
-auto get_field_length_ui_fields(Field field) -> std::size_t
+unsigned get_field_length_ui_fields(Field field)
 {
     switch(field)
     {
@@ -581,24 +576,42 @@ auto get_field_length_ui_fields(Field field) -> std::size_t
 }
 
 // Get length of the loaded ui fields
-auto get_field_length_host(ConfigHost const& host, Field field) -> std::size_t
+unsigned get_field_length_host(ConfigHost const& host, Field field)
 {
-    switch(field)
+    auto result = 0u;
+
+    switch (field)
     {
-        case Field::Fqhn:     return host.fqhn.size();
-        case Field::Alias:    return host.alias.value_or("").size();
-        case Field::Role:     return host.role.value_or("").size();
-        case Field::Device:   return host.device.value_or("").size();
-        case Field::Interval: return make_interval_string(host.interval).size();
-        case Field::Protocol: return make_proto_port_string(host.protocol, host.port).size();
-        default:              return 0;
+        case Field::Undef:
+            break;
+        case Field::Fqhn:
+            result = static_cast<unsigned>(host.fqhn.size());
+            break;
+        case Field::Alias:
+            result = static_cast<unsigned>(host.alias.value_or("").size());
+            break;
+        case Field::Role:
+            result = static_cast<unsigned>(host.role.value_or("").size());
+            break;
+        case Field::Device:
+            result = static_cast<unsigned>(host.device.value_or("").size());
+            break;
+        case Field::Interval:
+            result = static_cast<unsigned>(make_interval_string(host.interval).size());
+            break;
+        case Field::Protocol:
+            result = static_cast<unsigned>(make_proto_port_string(host.protocol, host.port).size());
+            break;
     }
+
+    return result;
 }
 
 // Get minimum length of a given Field to display it properly.
 void get_field_length( std::vector<ConfigGroup> const& groups
                      , Field const&                    field
-                     , ConfigGlobal::FieldLen&         field_len)
+                     , ConfigGlobal::FieldLen&         field_len
+                     )
 {
     // Get length of ui fields
     field_len = get_field_length_ui_fields(field);
@@ -608,8 +621,7 @@ void get_field_length( std::vector<ConfigGroup> const& groups
     {
         for (auto const& host: grp.hosts)
         {
-            field_len = std::max( field_len
-                                , get_field_length_host(host, field));
+            field_len = std::max(field_len, get_field_length_host(host, field));
         }
     }
 }
@@ -619,7 +631,7 @@ void generate_field_format(Config& cfg)
 {
     auto fmt = std::vector<ConfigGlobal::FieldFmt>();
     get_field_types_in_use(cfg.global.field_order, fmt);
-    
+
     // Get the max length from field values.
     for (auto& [type, length] : fmt)
     {
@@ -631,19 +643,19 @@ void generate_field_format(Config& cfg)
 } // anon namespace
 
 // Read and verify the configuration file.
-auto read_config_file(std::string const& cfg_file_path) -> Config
+Config read_config_file(std::string const& cfg_file_path)
 {
     auto cfg_file_content = std::vector<Line>();
     auto cfg = Config();
 
     load_config_file(cfg_file_path, cfg_file_content);
-    
+
     // Stage 1: Read config file contents into config data structure
     read_config(cfg_file_content, cfg);
 
     // Stage 2: Verify config data structure
     verify_config(cfg);
-    
+
     // Stage 3: Setup field format from config data structure
     generate_field_format(cfg);
 
@@ -651,7 +663,7 @@ auto read_config_file(std::string const& cfg_file_path) -> Config
 }
 
 // Straight forward implementations: Nothing special here ;)
-auto field_to_string(Field field) -> std::string
+std::string field_to_string(Field field)
 {
     switch(field)
     {
@@ -665,7 +677,7 @@ auto field_to_string(Field field) -> std::string
     }
 }
 
-auto string_to_field(std::string_view const& str) -> Field
+Field string_to_field(std::string_view const& str)
 {
     if (str == "FQHN")
     {
@@ -696,7 +708,7 @@ auto string_to_field(std::string_view const& str) -> Field
 
 
 // Config Streaming operators
-auto operator << (std::ostream& ost, Config& cfg) -> std::ostream&
+std::ostream& operator << (std::ostream& ost, Config const& cfg)
 {
     ost << "Config[global='" << cfg.global;
     ost << "', groups=[";
@@ -710,7 +722,7 @@ auto operator << (std::ostream& ost, Config& cfg) -> std::ostream&
     return ost;
 }
 
-auto operator << (std::ostream& ost, ConfigGlobal& cfg) -> std::ostream&
+std::ostream& operator << (std::ostream& ost, ConfigGlobal const& cfg)
 {
     ost << "ConfigGlobal[field_order='" << cfg.field_order;
     ost << "', field_format=[";
@@ -722,7 +734,7 @@ auto operator << (std::ostream& ost, ConfigGlobal& cfg) -> std::ostream&
     return ost;
 }
 
-auto operator << (std::ostream& ost, ConfigGroup& cfg) -> std::ostream&
+std::ostream& operator << (std::ostream& ost, ConfigGroup const& cfg)
 {
     ost << "ConfigGroup[name='" << cfg.name.value_or("");
     ost << "', hosts=[";
@@ -736,7 +748,7 @@ auto operator << (std::ostream& ost, ConfigGroup& cfg) -> std::ostream&
     return ost;
 }
 
-auto operator << (std::ostream& ost, ConfigHost& cfg) -> std::ostream&
+std::ostream& operator << (std::ostream& ost, ConfigHost const& cfg)
 {
     ost << "ConfigHost[fqhn='" << cfg.fqhn;
     ost << "', alias='" << cfg.alias.value_or("");

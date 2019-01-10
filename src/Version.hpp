@@ -14,15 +14,12 @@
 #ifndef VERSION_HPP_20181213224112
 #define VERSION_HPP_20181213224112
 
-/**
- * @brief Libraries Version information.
- */
 struct Version
 {
-    static char const * const major; ///< Major Version number
-    static char const * const minor; ///< Minor Version number
-    static char const * const rev;   ///< Revision number
-    static char const * const full;  ///< Full version number
+    static char const * const major; // Major Version number
+    static char const * const minor; // Minor Version number
+    static char const * const rev;   // Revision number
+    static char const * const full;  // Full version number
 };
 
 #endif // VERSION_HPP_20181213224112

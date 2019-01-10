@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      ObserverElement.hpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Command line argument parsing.
+ * @copyright 2017 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file   ObserverElement.hpp
- * @author Simon Brummer
- * @date   08.04.2018
  */
 
 #ifndef OBSERVERELEMENT_HPP_201804081223
@@ -20,10 +19,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <cstdint>
+#include <host_monitor/HostMonitor.hpp>
+#include <host_monitor/HostMonitorObserver.hpp>
 #include "Config.hpp"
 #include "Element.hpp"
-#include "../../host_monitor/include/HostMonitor.hpp"
-#include "../../host_monitor/include/HostMonitorObserver.hpp"
 
 using host_monitor::HostMonitorObserver;
 using host_monitor::Endpoint;
@@ -41,14 +40,15 @@ public:
                    , std::vector<ConfigGlobal::FieldFmt> const& fmt
                    , std::mutex&                                mtx
                    , std::condition_variable&                   cv
-                   , std::atomic_bool&                          redraw_ui);
+                   , std::atomic_bool&                          redraw_ui
+                   );
 
     virtual ~ObserverElement() = default;
 
     // Element Interface interface implementation
-    virtual void draw(Window::Pointer wnd, Position& pos) override;
-    virtual auto get_height() -> std::uint16_t override ;
-    virtual auto get_width() -> std::uint16_t override ;
+    virtual void draw(Window::Pointer wnd, Position& pos) const override;
+    virtual unsigned get_height() const override ;
+    virtual unsigned get_width() const override ;
 
     // HostMonitorObserver interface implementation. Executed in the thread
     // context of host monitor

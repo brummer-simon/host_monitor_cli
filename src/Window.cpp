@@ -1,28 +1,29 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      Window.cpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Wrapper for ncurses windows
+ * @copyright 2018 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
-/**
- * @file   Window.cpp
- * @author Simon Brummer
- * @date   08.04.2018
- */
-
 #include "Window.hpp"
 
 Window::Window( Position const& origin
-              , std::uint32_t   width
-              , std::uint32_t   height)
+              , unsigned        width
+              , unsigned        height
+              )
     : wnd_(nullptr)
     , origin_(origin)
     , width_(width)
     , height_(height)
-    , color_(ColorPair( Window::Color::Default 
-                      , Window::Color::Default))
+    , color_(ColorPair( Window::Color::Default
+                      , Window::Color::Default)
+                      )
 {
     // Create Window Pointer
     auto pointer = newwin(height, width, origin.y, origin.x);
@@ -55,14 +56,14 @@ void Window::set_background_color(Window::Color c)
 
 void Window::set_color(Window::Color fg, Window::Color bg)
 {
-    static auto color_counter = std::size_t(0);
+    static auto color_counter = short(0);
 
     color_ = ColorPair(fg, bg);
 
-    // Lookup requested colorpair. Create a new one if it cant be found.
+    // Lookup requested color pair. Create a new one if it cant be found.
     if (colors_.find(color_) == colors_.cend())
     {
-        color_counter  += 1;
+        ++color_counter;
         colors_[color_] = color_counter;
     }
 
@@ -70,9 +71,10 @@ void Window::set_color(Window::Color fg, Window::Color bg)
     auto color_id = colors_[color_];
     std::tie(fg, bg) = color_;
 
-    init_pair( color_id
-             , static_cast<uint16_t>(fg)
-             , static_cast<uint16_t>(bg));
+    init_pair(color_id
+             , static_cast<short>(fg)
+             , static_cast<short>(bg)
+             );
 
     wattron(wnd_.get(), COLOR_PAIR(color_id));
 }
@@ -89,12 +91,12 @@ void Window::unset_color()
     wattroff(wnd_.get(), COLOR_PAIR(pos->second));
 }
 
-void Window::set_underlined(void)
+void Window::set_underlined()
 {
     wattron(wnd_.get(), A_UNDERLINE);
 }
 
-void Window::unset_underlined(void)
+void Window::unset_underlined()
 {
     wattroff(wnd_.get(), A_UNDERLINE);
 }
@@ -116,22 +118,22 @@ void Window::add_string(std::string const& str, std::size_t str_len)
     }
 }
 
-void Window::add_vertical_line(std::uint32_t len)
+void Window::add_vertical_line(unsigned len)
 {
     add_vertical_line(0, len);
 }
 
-void Window::add_vertical_line(std::uint8_t ch, std::uint32_t len)
+void Window::add_vertical_line(char ch, unsigned len)
 {
     wvline(wnd_.get(), ch, len);
 }
 
-void Window::add_horizontal_line(std::uint32_t len)
+void Window::add_horizontal_line(unsigned len)
 {
     add_horizontal_line(0, len);
 }
 
-void Window::add_horizontal_line(std::uint8_t ch, std::uint32_t len)
+void Window::add_horizontal_line(char ch, unsigned len)
 {
     whline(wnd_.get(), ch, len);
 }
@@ -141,14 +143,15 @@ void Window::add_border(void)
     add_border(0, 0, 0, 0, 0, 0, 0, 0);
 }
 
-void Window::add_border( std::uint8_t left_side
-                       , std::uint8_t right_side
-                       , std::uint8_t top_side
-                       , std::uint8_t bottom_side
-                       , std::uint8_t top_left_corner
-                       , std::uint8_t top_right_corner
-                       , std::uint8_t bottom_left_corner
-                       , std::uint8_t bottom_right_corner)
+void Window::add_border( char left_side
+                       , char right_side
+                       , char top_side
+                       , char bottom_side
+                       , char top_left_corner
+                       , char top_right_corner
+                       , char bottom_left_corner
+                       , char bottom_right_corner
+                       )
 {
     wborder( wnd_.get()
            , left_side
@@ -158,45 +161,46 @@ void Window::add_border( std::uint8_t left_side
            , top_left_corner
            , top_right_corner
            , bottom_left_corner
-           , bottom_right_corner);
+           , bottom_right_corner
+           );
 }
 
-void Window::erase(void)
+void Window::erase()
 {
     werase(wnd_.get());
 }
 
-void Window::refresh(void)
+void Window::refresh()
 {
     wrefresh(wnd_.get());
 }
 
-auto Window::get_origin(void) -> Position
+Position Window::get_origin() const
 {
     return origin_;
 }
 
-auto Window::get_width(void) -> std::uint32_t
+unsigned Window::get_width() const
 {
     return width_;
 }
 
-auto Window::get_height(void) -> std::uint32_t
+unsigned Window::get_height() const
 {
     return height_;
 }
 
-auto Window::get_fg_color(void) -> Window::Color
+Window::Color Window::get_fg_color() const
 {
     return color_.first;
 }
 
-auto Window::get_bg_color(void) -> Window::Color
+Window::Color Window::get_bg_color() const
 {
     return color_.second;
 }
 
-auto Window::get_raw_pointer(void) -> CursesWnd *
+Window::CursesWnd* Window::get_raw_pointer() const
 {
     return wnd_.get();
 }

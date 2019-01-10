@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      UserInterface.cpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Command line argument parsing.
+ * @copyright 2017 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file   UserInterface.cpp
- * @author Simon Brummer
- * @date   08.04.2018
  */
 
 #include <cstdint>
@@ -21,7 +20,7 @@
 namespace
 {
 // Create header string from given field format.
-auto make_header_string(std::vector<ConfigGlobal::FieldFmt> const& fmt) -> std::string
+std::string make_header_string(std::vector<ConfigGlobal::FieldFmt> const& fmt)
 {
     auto tmp = std::string();
 
@@ -63,14 +62,16 @@ auto make_header_string(std::vector<ConfigGlobal::FieldFmt> const& fmt) -> std::
 
     // Append status
     append_and_fill(tmp, ui_header_status, std::max( std::strlen(ui_status_available)
-                                                   , std::strlen(ui_status_unavailable)));
+                                                   , std::strlen(ui_status_unavailable))
+                                                   );
 
     return tmp;
 }
 } // namespace anon
 
 UserInterface::UserInterface( std::vector<GroupElement::Pointer> const&  groups
-                            , std::vector<ConfigGlobal::FieldFmt> const& fmt)
+                            , std::vector<ConfigGlobal::FieldFmt> const& fmt
+                            )
     : wnd_(nullptr)
     , groups_(groups)
 {
@@ -92,8 +93,8 @@ void UserInterface::rebuild_ui(void)
 
 void UserInterface::draw(void)
 {
-    auto line_len = std::int16_t(0);
-    auto chars_left = std::int16_t(0);
+    auto line_len   = 0;
+    auto chars_left = 0;
 
     // Calculate line length and chars per line. Prevent underflows.
     line_len = wnd_->get_width() - (2 * ui_border_width);
@@ -122,7 +123,7 @@ void UserInterface::draw(void)
     {
         grp->draw(wnd_, pos);
 
-        // Add empty line between groups 
+        // Add empty line between groups
         pos.y += 1;
     }
     pos.y -= 1;
@@ -145,12 +146,12 @@ void UserInterface::draw(void)
 
 void UserInterface::setup_curses()
 {
-    auto height = std::uint16_t(0);
-    auto width = std::uint16_t(0);
-    auto content_origin_x = std::uint16_t(0);
-    auto content_origin_y = std::uint16_t(0);
-    auto content_height = std::uint16_t(0);
-    auto content_width = std::uint16_t(0);
+    auto height           = unsigned(0);
+    auto width            = unsigned(0);
+    auto content_origin_x = unsigned(0);
+    auto content_origin_y = unsigned(0);
+    auto content_height   = unsigned(0);
+    auto content_width    = unsigned(0);
 
     // Setup curses screen
     initscr();
@@ -172,16 +173,18 @@ void UserInterface::setup_curses()
     }
 
     // Add lines for whitespaces between groups
-    content_height += ui_line_offset_y * groups_.size() - 1;
+    content_height += static_cast<unsigned>(ui_line_offset_y * groups_.size() - 1);
 
     // Add Room of the Header and Footer
     content_height += ui_header_height;
     content_width = std::max( content_width
-                            , static_cast<std::uint16_t>(header_.size()));
+                            , static_cast<unsigned>(header_.size())
+                            );
 
     content_height += ui_footer_height;
     content_width = std::max( content_width
-                            , static_cast<std::uint16_t>(std::strlen(ui_footer_quit)));
+                            , static_cast<unsigned>(std::strlen(ui_footer_quit))
+                            );
 
     // Add Borders
     content_width  += 2 * ui_border_width;
@@ -211,9 +214,11 @@ void UserInterface::setup_curses()
 
     // Rebuild window with based on current terminal size
     wnd_ = std::make_shared<Window>( Position( content_origin_x
-                                             , content_origin_y)
+                                             , content_origin_y
+                                             )
                                    , content_width
-                                   , content_height);
+                                   , content_height
+                                   );
 }
 
 void UserInterface::teardown_curses()

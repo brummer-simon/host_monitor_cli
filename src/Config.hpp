@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2017 Simon Brummer <simon.brummer@posteo.de>
- *
+ * @file      Config.hpp
+ * @author    Simon Brummer (<simon.brummer@posteo.de>)
+ * @brief     Command line argument parsing.
+ * @copyright 2017 Simon Brummer. All rights reserved.
+ */
+
+/*
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file   Config.hpp
- * @author Simon Brummer
- * @date   08.04.2018
  */
 
 #ifndef CONFIG_HPP_201804081223
@@ -33,8 +32,8 @@ enum class Field
     Interval
 };
 
-auto field_to_string(Field field) -> std::string;
-auto string_to_field(std::string_view const& str) -> Field;
+std::string field_to_string(Field field);
+Field string_to_field(std::string_view const& str);
 
 // Configuration Objects
 struct ConfigHost
@@ -56,7 +55,7 @@ struct ConfigGroup
 
 struct ConfigGlobal
 {
-    using FieldLen = size_t;
+    using FieldLen = unsigned;
     using FieldFmt = std::pair<Field, FieldLen>;
 
     std::string           field_order;
@@ -70,12 +69,11 @@ struct Config
 };
 
 // Read configuration from file.
-auto read_config_file(std::string const& path) -> Config;
+Config read_config_file(std::string const& path);
 
-// Config struct streaming functions
-auto operator << (std::ostream& ost, Config& cfg) -> std::ostream&;
-auto operator << (std::ostream& ost, ConfigGlobal& cfg) -> std::ostream&;
-auto operator << (std::ostream& ost, ConfigGroup& cfg) -> std::ostream&;
-auto operator << (std::ostream& ost, ConfigHost& cfg) -> std::ostream&;
+std::ostream& operator << (std::ostream& ost, Config const& cfg);
+std::ostream& operator << (std::ostream& ost, ConfigGlobal const& cfg);
+std::ostream& operator << (std::ostream& ost, ConfigGroup const& cfg);
+std::ostream& operator << (std::ostream& ost, ConfigHost const& cfg);
 
 #endif // CONFIG_HPP_201804081223
