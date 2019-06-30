@@ -43,7 +43,16 @@ FQHN:     127.0.0.1          # see above
 ALIAS:    localhost          # see above
 ROLE:     localhost          # see abobe
 DEVICE:   Your PC            # see above
-PROTOCOL: ICMP               # see above
+PROTOCOL: ICMPV4             # see above
+INTERVAL: 10                 # see above
+END_HOST                     # see above
+
+BEGIN_HOST
+FQHN:     ::1                # see above
+ALIAS:    localhost          # see above
+ROLE:     localhost          # see abobe
+DEVICE:   Your PC            # see above
+PROTOCOL: ICMPV6             # see above
 INTERVAL: 10                 # see above
 END_HOST                     # see above
 END_GROUP                    # End group

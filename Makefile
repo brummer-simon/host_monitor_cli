@@ -6,7 +6,7 @@ PROJECT_NAME     := host_monitor_cli
 PROJECT_TYPE     := binary
 PROJECT_CONFIG   := release
 VERSION_MAJOR    := 1
-VERSION_MINOR    := 0
+VERSION_MINOR    := 1
 VERSION_REVISION := 0
 
 include etc/make/header.mk
