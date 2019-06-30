@@ -440,7 +440,7 @@ void verify_host_section(ConfigHost const& host)
     }
     else
     {
-        abort("A hosts protocol is not TCP or ICMP");
+        abort("A hosts protocol is neither ICMPV4, ICMPV6 nor TCP.");
     }
 }
 

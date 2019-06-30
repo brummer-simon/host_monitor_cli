@@ -42,6 +42,23 @@ namespace
     std::function<void(int)> signal_handler;
 }
 
+Endpoint make_endpoint(ConfigHost const& host)
+{
+    auto proto = string_to_protocol(host.protocol);
+
+    switch (proto.value())
+    {
+        case Proto::ICMPV4:
+            return Endpoint::make_icmpv4_endpoint(host.fqhn);
+        case Proto::ICMPV6:
+            return Endpoint::make_icmpv6_endpoint(host.fqhn);
+        case Proto::TCP:
+            return Endpoint::make_tcp_endpoint(host.fqhn, host.port.value());
+    }
+
+    throw std::runtime_error("Invalid Given Protocol. Abort.");
+}
+
 int main(int argc, char **argv)
 {
     // Synchronization primitives
@@ -95,11 +112,7 @@ int main(int argc, char **argv)
         for (auto const& host : grp.hosts)
         {
             // Create Host Monitor and Observers
-            auto p        = string_to_protocol(host.protocol);
-            auto endpoint = (p.value() == Proto::ICMP) ? Endpoint::make_icmp_endpoint(host.fqhn)
-                                                       : Endpoint::make_tcp_endpoint(host.fqhn, host.port.value()
-                                                       );
-
+            auto endpoint = make_endpoint(host);
             auto interval = sec(string_to_int(host.interval).value());
             auto monitor  = std::make_shared<HostMonitor>(endpoint, interval);
             auto observer = std::make_shared<ObserverElement>( host
@@ -107,7 +120,7 @@ int main(int argc, char **argv)
                                                              , mtx
                                                              , cv
                                                              , redraw_ui
-                                                                );
+                                                             );
 
             // Attach observer and store association for later cleanup
             monitor->add_observer(observer);
