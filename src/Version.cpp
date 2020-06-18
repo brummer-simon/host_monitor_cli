@@ -20,5 +20,5 @@
 // Initialize Version numbers with given version from makefile.
 char const * const Version::major = STRINGIFY(VERSION_MAJOR);
 char const * const Version::minor = STRINGIFY(VERSION_MINOR);
-char const * const Version::rev   = STRINGIFY(VERSION_REVISION);
+char const * const Version::patch = STRINGIFY(VERSION_PATCH);
 char const * const Version::full  = STRINGIFY(VERSION);

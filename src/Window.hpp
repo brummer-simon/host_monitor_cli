@@ -17,6 +17,7 @@
 #include <memory>
 #include <map>
 #include <functional>
+#include <string>
 #include <cstdint>
 #include <curses.h>
 
